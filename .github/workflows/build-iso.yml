@@ -1,0 +1,115 @@
+name: Build & Release IRAM OS Live ISO
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version tag (e.g. v26.04.0 or v24.04.1)'
+        required: true
+        default: 'v26.04.0'
+      base_codename:
+        description: 'Target base codename (resolute or noble)'
+        required: true
+        default: 'resolute'
+      distro_version:
+        description: 'Target distro version (26.04 or 24.04)'
+        required: true
+        default: '26.04'
+
+permissions:
+  contents: write
+
+jobs:
+  build-iso:
+    name: Build Bootable Live ISO
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Free Disk Space on Runner
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          df -h
+
+      - name: Install ISO Build Dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y \
+            binutils \
+            debootstrap \
+            squashfs-tools \
+            xorriso \
+            grub-pc-bin \
+            grub-efi-amd64-bin \
+            mtools \
+            dosfstools \
+            isolinux \
+            syslinux-utils \
+            zstd \
+            xz-utils
+
+      - name: Run ISO Builder
+        env:
+          BASE_CODENAME: ${{ github.event.inputs.base_codename || 'resolute' }}
+          DISTRO_VERSION: ${{ github.event.inputs.distro_version || '26.04' }}
+        run: |
+          sudo -E bash build/build-iso.sh
+
+      - name: List Generated Artifacts
+        run: |
+          ls -lh out/
+
+      - name: Upload ISO Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iram-os-Live-ISO
+          path: |
+            out/*.iso
+            out/sha256sum.txt
+          retention-days: 14
+
+      - name: Attach ISO to GitHub Release
+        if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name || github.event.inputs.version || github.ref_name }}
+          name: ${{ github.event.release.name || format('IRAM OS {0}', github.event.inputs.version || github.ref_name) }}
+          body: |
+            # 🚀 IRAM OS Live ISO Release
+
+            Welcome to the official release of **IRAM OS** — the turnkey agentic Hyprland + Waybar desktop operating system.
+
+            ### 📦 Download Links
+            - **Live ISO Image**: Available in the release assets below (`iram-os-*.iso`).
+            - **Checksum**: Verify the SHA256 checksum against `sha256sum.txt`.
+
+            ### 💻 How to Flash & Boot
+            1. Download the `.iso` file.
+            2. Flash to a USB drive using [BalenaEtcher](https://etcher.balena.io/), [Ventoy](https://www.ventoy.net/), or [Rufus](https://rufus.ie/).
+            3. Boot your PC, choose your USB drive in the boot menu (`F12`, `F11`, or `Esc`).
+            4. Default Live Session Credentials:
+               - **User**: `iram`
+               - **Password**: `iram` *(Passwordless sudo enabled)*
+
+            ### ✨ Key Features
+            - Pre-configured Hyprland Wayland compositor with fluid animations
+            - Dual-monitor auto-detection with GUI manager (`iram-displays-gui`)
+            - Out-of-the-box PipeWire audio routing & toggle shortcuts (`Super + Shift + A`)
+            - Persistent Waybar & wallpaper services with 0 collisions
+            - 22 custom built-in themes with instant live switching
+          files: |
+            out/*.iso
+            out/sha256sum.txt
+          draft: false
+          prerelease: false

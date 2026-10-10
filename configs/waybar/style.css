@@ -1,0 +1,215 @@
+@import "colors.css";
+
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 12px;
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: rgba(18, 18, 28, 0.95);
+    color: @fg;
+    border: 1px solid @border;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+#custom-menu {
+    padding: 0 14px;
+    margin: 0;
+    background: @accent;
+    color: #11111b;
+    font-size: 14px;
+    font-weight: 800;
+    border-radius: 0;
+    transition: all 0.15s ease-in-out;
+}
+
+#custom-menu:hover {
+    background: @fg;
+    color: #11111b;
+}
+
+#workspaces {
+    margin: 0;
+    padding: 0;
+}
+
+#workspaces button {
+    padding: 0 12px;
+    margin: 0;
+    background: transparent;
+    color: @muted;
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+    font-weight: 700;
+    transition: all 0.15s ease-in-out;
+}
+
+#workspaces button.active {
+    background: @accent_rgba;
+    color: @accent;
+    border-bottom: 2px solid @accent;
+    font-weight: 800;
+}
+
+#workspaces button:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: @fg;
+}
+
+#workspaces button.urgent {
+    background: #f7768e;
+    color: #11111b;
+    border-bottom: 2px solid #f7768e;
+}
+
+#window {
+    padding: 0 14px;
+    font-weight: 600;
+    color: @muted;
+}
+
+#clock {
+    padding: 0 14px;
+    margin: 0 1px;
+    background: rgba(255, 255, 255, 0.04);
+    font-weight: 800;
+    color: @accent;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid @accent;
+    transition: all 0.15s ease;
+}
+
+#clock:hover {
+    background: @accent_rgba;
+}
+
+#custom-weather {
+    padding: 0 12px;
+    margin: 0 1px;
+    background: rgba(255, 255, 255, 0.03);
+    color: @fg;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s ease;
+}
+
+#custom-weather:hover {
+    background: @accent_rgba;
+    border-bottom: 2px solid @accent;
+}
+
+#mpris {
+    padding: 0 12px;
+    margin: 0 1px;
+    background: rgba(255, 255, 255, 0.03);
+    color: @fg;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s ease;
+}
+
+#mpris.paused {
+    color: @muted;
+}
+
+#mpris:hover {
+    background: @accent_rgba;
+    border-bottom: 2px solid @accent;
+}
+
+#custom-ai-agent,
+#custom-theme,
+#cpu,
+#memory,
+#pulseaudio,
+#network,
+#battery {
+    padding: 0 10px;
+    margin: 0 1px;
+    background: rgba(255, 255, 255, 0.03);
+    color: @fg;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s ease;
+}
+
+#custom-ai-agent {
+    color: @accent;
+    font-weight: 800;
+    padding: 0 12px;
+}
+
+#custom-ai-agent:hover {
+    background: @accent_rgba;
+    border-bottom: 2px solid @accent;
+}
+
+#custom-ai-agent.executing {
+    color: #f7768e;
+    background: rgba(247, 118, 142, 0.18);
+    border-bottom: 2px solid #f7768e;
+    animation: blink 0.8s linear infinite alternate;
+}
+
+#custom-theme {
+    color: @accent;
+    font-size: 13px;
+    padding: 0 10px;
+}
+
+#pulseaudio {
+    color: @accent;
+}
+
+#cpu:hover,
+#memory:hover,
+#pulseaudio:hover,
+#network:hover,
+#battery:hover,
+#custom-theme:hover {
+    background: @accent_rgba;
+    border-bottom: 2px solid @accent;
+}
+
+#tray {
+    padding: 0 8px;
+    margin: 0 1px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background-color: #f7768e;
+}
+
+#custom-power {
+    padding: 0 14px;
+    margin: 0;
+    background: rgba(247, 118, 142, 0.18);
+    color: #f7768e;
+    font-weight: 800;
+    border-bottom: 2px solid #f7768e;
+    transition: all 0.15s ease;
+}
+
+#custom-power:hover {
+    background: #f7768e;
+    color: #11111b;
+}
+
+#battery.warning {
+    color: #f7768e;
+    border-bottom: 2px solid #f7768e;
+}
+
+#battery.critical {
+    background-color: #f7768e;
+    color: #11111b;
+    border-bottom: 2px solid #f7768e;
+    animation: blink 0.5s linear infinite alternate;
+}

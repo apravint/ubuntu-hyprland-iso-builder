@@ -1,0 +1,157 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    "margin-top": 4,
+    "margin-left": 4,
+    "margin-right": 4,
+    "margin-bottom": 0,
+    "spacing": 0,
+
+    "modules-left": [
+        "custom/menu",
+        "hyprland/workspaces",
+        "hyprland/window"
+    ],
+    "modules-center": [
+        "clock",
+        "custom/weather",
+        "mpris"
+    ],
+    "modules-right": [
+        "custom/ai-agent",
+        "custom/theme",
+        "cpu",
+        "memory",
+        "pulseaudio",
+        "network",
+        "tray",
+        "custom/power"
+    ],
+
+    "custom/menu": {
+        "format": "󰀻",
+        "tooltip": "Left-click: Iram Menu | Right-click: Terminal",
+        "on-click": "~/.local/bin/iram-menu",
+        "on-click-right": "alacritty"
+    },
+
+    "hyprland/workspaces": {
+        "format": "{name}",
+        "on-click": "activate",
+        "sort-by-number": true
+    },
+
+    "hyprland/window": {
+        "max-length": 45,
+        "separate-outputs": true,
+        "tooltip": false
+    },
+
+    "clock": {
+        "format": "󰃭 {:%a %b %d  %H:%M}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "on-click-middle": "~/.local/bin/iram-menu-timezone"
+    },
+
+    "custom/weather": {
+        "format": "{}",
+        "return-type": "json",
+        "interval": 300,
+        "exec": "~/.local/bin/iram-waybar-weather",
+        "on-click": "~/.local/bin/iram-notification-weather"
+    },
+
+    "custom/ai-agent": {
+        "format": "{}",
+        "return-type": "json",
+        "interval": 5,
+        "exec": "~/.local/bin/iram-waybar-agent",
+        "on-click": "~/.local/bin/iram-agent-sidecar",
+        "on-click-right": "~/.local/bin/iram-models",
+        "on-click-middle": "~/.local/bin/iram-health-agent"
+    },
+
+    "mpris": {
+        "format": "{player_icon} {title} - {artist}",
+        "format-paused": "{status_icon} <i>{title}</i>",
+        "max-length": 30,
+        "player-icons": {
+            "default": "󰐊",
+            "spotify": "󰓇",
+            "chromium": "󰊯",
+            "chrome": "󰊯",
+            "firefox": "󰈹",
+            "mpv": "󰕼"
+        },
+        "status-icons": {
+            "paused": "󰏤"
+        }
+    },
+
+    "custom/theme": {
+        "format": "󰔎",
+        "tooltip": "Left-click: Theme Switcher | Right-click: Next Wallpaper",
+        "on-click": "~/.local/bin/iram-theme-switch",
+        "on-click-right": "iram theme bg next"
+    },
+
+    "cpu": {
+        "format": "󰍛 {usage}%",
+        "interval": 3,
+        "on-click": "alacritty -e btop"
+    },
+
+    "memory": {
+        "format": "󰘚 {percentage}%",
+        "interval": 5,
+        "on-click": "alacritty -e btop"
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "󰝟 MUTED",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "scroll-step": 5,
+        "tooltip-format": "{desc} | Left: Audio mixer | Middle: Cycle output (Bluetooth/TV/Monitor) | Right: Mute",
+        "on-click": "pavucontrol",
+        "on-click-middle": "~/.local/bin/iram-audio-toggle",
+        "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+        "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +5%",
+        "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -5%"
+    },
+
+    "battery": {
+        "states": {
+            "good": 95,
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
+        "format-plugged": "󰂄 {capacity}%",
+        "format-alt": "{icon} {time}",
+        "format-icons": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
+    },
+
+    "network": {
+        "format-wifi": "󰖩 {essid}",
+        "format-ethernet": "󰈀 ETH",
+        "format-disconnected": "󰖪 OFFLINE",
+        "tooltip-format": "Signal: {signalStrength}% | IP: {ipaddr}",
+        "on-click": "nm-connection-editor",
+        "on-click-right": "alacritty -e nmtui"
+    },
+
+    "tray": {
+        "spacing": 10
+    },
+
+    "custom/power": {
+        "format": "⏻",
+        "tooltip": "Power Menu (Lock, Sleep, Logout, Shutdown)",
+        "on-click": "~/.local/bin/iram-power-menu"
+    }
+}
