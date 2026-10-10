@@ -260,8 +260,10 @@ log_step "Injecting Iram scripts, systemd units, and skeleton user configs..."
 
 # Copy Iram system-wide binaries & profile
 mkdir -p "${ROOTFS_DIR}/usr/local/bin" "${ROOTFS_DIR}/usr/share/wayland-sessions" "${ROOTFS_DIR}/etc/profile.d"
-cp -a --remove-destination "${REPO_ROOT}/bin/"* "${ROOTFS_DIR}/usr/local/bin/"
-find "${ROOTFS_DIR}/usr/local/bin/" -type f -exec chmod +x {} + 2>/dev/null || true
+if [ -d "${REPO_ROOT}/bin" ] && [ -n "$(ls -A "${REPO_ROOT}/bin" 2>/dev/null)" ]; then
+    cp -a --remove-destination "${REPO_ROOT}/bin/"* "${ROOTFS_DIR}/usr/local/bin/"
+    find "${ROOTFS_DIR}/usr/local/bin/" -type f -exec chmod +x {} + 2>/dev/null || true
+fi
 
 # Safely symlink any additional upstream iram binaries that were not overridden
 chroot "${ROOTFS_DIR}" /bin/bash << 'POST_CHROOT_EOF'
@@ -294,22 +296,33 @@ fi
 
 # Copy skeleton configs so every user (and live user) gets them
 mkdir -p "${ROOTFS_DIR}/etc/skel/.config" "${ROOTFS_DIR}/etc/skel/.local/bin" "${ROOTFS_DIR}/etc/skel/.local/share/applications" "${ROOTFS_DIR}/etc/skel/.local/share/icons/hicolor/128x128/apps"
-cp -a --remove-destination "${REPO_ROOT}/config/"* "${ROOTFS_DIR}/etc/skel/.config/"
-cp -a --remove-destination "${REPO_ROOT}/bin/"* "${ROOTFS_DIR}/etc/skel/.local/bin/"
-cp -a --remove-destination "${REPO_ROOT}/applications/"*.desktop "${ROOTFS_DIR}/etc/skel/.local/share/applications/" 2>/dev/null || true
-cp -a --remove-destination "${REPO_ROOT}/applications/icons/"*.png "${ROOTFS_DIR}/etc/skel/.local/share/icons/hicolor/128x128/apps/" 2>/dev/null || true
-
-# Also copy into the live user's home directly
 mkdir -p "${ROOTFS_DIR}/home/iram/.config" "${ROOTFS_DIR}/home/iram/.local/bin" "${ROOTFS_DIR}/home/iram/.local/share/applications" "${ROOTFS_DIR}/home/iram/.local/share/icons/hicolor/128x128/apps"
-cp -a --remove-destination "${REPO_ROOT}/config/"* "${ROOTFS_DIR}/home/iram/.config/"
-cp -a --remove-destination "${REPO_ROOT}/bin/"* "${ROOTFS_DIR}/home/iram/.local/bin/"
-cp -a --remove-destination "${REPO_ROOT}/applications/"*.desktop "${ROOTFS_DIR}/home/iram/.local/share/applications/" 2>/dev/null || true
-cp -a --remove-destination "${REPO_ROOT}/applications/icons/"*.png "${ROOTFS_DIR}/home/iram/.local/share/icons/hicolor/128x128/apps/" 2>/dev/null || true
+
+if [ -d "${REPO_ROOT}/configs" ] && [ -n "$(ls -A "${REPO_ROOT}/configs" 2>/dev/null)" ]; then
+    cp -a --remove-destination "${REPO_ROOT}/configs/"* "${ROOTFS_DIR}/etc/skel/.config/"
+    cp -a --remove-destination "${REPO_ROOT}/configs/"* "${ROOTFS_DIR}/home/iram/.config/"
+fi
+if [ -d "${REPO_ROOT}/config" ] && [ -n "$(ls -A "${REPO_ROOT}/config" 2>/dev/null)" ]; then
+    cp -a --remove-destination "${REPO_ROOT}/config/"* "${ROOTFS_DIR}/etc/skel/.config/"
+    cp -a --remove-destination "${REPO_ROOT}/config/"* "${ROOTFS_DIR}/home/iram/.config/"
+fi
+if [ -d "${REPO_ROOT}/bin" ] && [ -n "$(ls -A "${REPO_ROOT}/bin" 2>/dev/null)" ]; then
+    cp -a --remove-destination "${REPO_ROOT}/bin/"* "${ROOTFS_DIR}/etc/skel/.local/bin/"
+    cp -a --remove-destination "${REPO_ROOT}/bin/"* "${ROOTFS_DIR}/home/iram/.local/bin/"
+fi
+if [ -d "${REPO_ROOT}/applications" ]; then
+    cp -a --remove-destination "${REPO_ROOT}/applications/"*.desktop "${ROOTFS_DIR}/etc/skel/.local/share/applications/" 2>/dev/null || true
+    cp -a --remove-destination "${REPO_ROOT}/applications/icons/"*.png "${ROOTFS_DIR}/etc/skel/.local/share/icons/hicolor/128x128/apps/" 2>/dev/null || true
+    cp -a --remove-destination "${REPO_ROOT}/applications/"*.desktop "${ROOTFS_DIR}/home/iram/.local/share/applications/" 2>/dev/null || true
+    cp -a --remove-destination "${REPO_ROOT}/applications/icons/"*.png "${ROOTFS_DIR}/home/iram/.local/share/icons/hicolor/128x128/apps/" 2>/dev/null || true
+fi
 
 # Copy systemd units
 mkdir -p "${ROOTFS_DIR}/etc/skel/.config/systemd/user" "${ROOTFS_DIR}/home/iram/.config/systemd/user"
-cp -a --remove-destination "${REPO_ROOT}/config/systemd/user/"* "${ROOTFS_DIR}/etc/skel/.config/systemd/user/" 2>/dev/null || true
-cp -a --remove-destination "${REPO_ROOT}/config/systemd/user/"* "${ROOTFS_DIR}/home/iram/.config/systemd/user/" 2>/dev/null || true
+if [ -d "${REPO_ROOT}/config/systemd/user" ]; then
+    cp -a --remove-destination "${REPO_ROOT}/config/systemd/user/"* "${ROOTFS_DIR}/etc/skel/.config/systemd/user/" 2>/dev/null || true
+    cp -a --remove-destination "${REPO_ROOT}/config/systemd/user/"* "${ROOTFS_DIR}/home/iram/.config/systemd/user/" 2>/dev/null || true
+fi
 
 # Fix permissions
 chroot "${ROOTFS_DIR}" chown -R iram:iram /home/iram 2>/dev/null || true
